@@ -1,0 +1,89 @@
+name: Build APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download base APK
+        run: |
+          gh release download base-apk --pattern "*.apk" -D base/ -R ${{ github.repository }}
+          ls base/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install apktool
+        run: |
+          APKTOOL_VER=2.9.3
+          mkdir -p $HOME/bin
+          wget -q "https://github.com/iBotPeaches/Apktool/releases/download/v${APKTOOL_VER}/apktool_${APKTOOL_VER}.jar" -O $HOME/bin/apktool.jar
+          wget -q "https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool" -O $HOME/bin/apktool
+          chmod +x $HOME/bin/apktool
+          echo "$HOME/bin" >> $GITHUB_PATH
+          java -jar $HOME/bin/apktool.jar --version
+
+      - name: Decompile APK
+        run: |
+          APK=$(ls base/*.apk | head -1)
+          echo "Decompiling: $APK"
+          java -jar $HOME/bin/apktool.jar d "$APK" -o apktool_out -f
+
+      - name: Remove uncompilable apktool artifacts
+        run: |
+          rm -f apktool_out/res/values/raws.xml
+
+      - name: Apply patches
+        run: |
+          if [ -d "patches" ] && [ "$(ls -A patches)" ]; then
+            echo "Applying patches..."
+            cp -r patches/. apktool_out/
+            echo "Patches applied."
+          else
+            echo "No patches to apply."
+          fi
+
+      - name: Rebuild APK
+        run: |
+          java -jar $HOME/bin/apktool.jar b apktool_out -o rebuilt-unsigned.apk
+
+      - name: Align and Sign
+        run: |
+          BUILD_TOOLS=$(ls ${ANDROID_SDK_ROOT}/build-tools | sort -V | tail -1)
+          ${ANDROID_SDK_ROOT}/build-tools/${BUILD_TOOLS}/zipalign -f -v 4 rebuilt-unsigned.apk rebuilt-aligned.apk
+
+          APK_NAME="REF4IK-Banner-${GITHUB_REF_NAME}.apk"
+          ${ANDROID_SDK_ROOT}/build-tools/${BUILD_TOOLS}/apksigner sign \
+            --key testkey.pk8 \
+            --cert testkey.x509.pem \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$APK_NAME" \
+            rebuilt-aligned.apk
+
+          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+          echo "Built: $APK_NAME ($(du -sh "$APK_NAME" | cut -f1))"
+
+      - name: Upload APK to release
+        run: |
+          gh release upload "${GITHUB_REF_NAME}" "${{ env.APK_NAME }}" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: REF4IK-Banner-${{ github.ref_name }}
+          path: REF4IK-Banner-*.apk
+          retention-days: 30
