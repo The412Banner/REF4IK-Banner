@@ -1,7 +1,44 @@
 # REF4IK-Banner — Store Integration Report
-**Generated:** 2026-04-11  
+**Generated:** 2026-04-11 | **Last updated:** 2026-04-11
 **Purpose:** Detailed blueprint for adding GOG, Epic Games, and Amazon Games store integrations to Winlator REF4IK+, modelled on the Ludashi-plus implementation  
 **Source analysis:** `~/winlator_analysis/` (apktool + JADX of REF4IK base APK) + Ludashi-plus GitHub repo + store pipeline reports
+
+---
+
+## Implementation Status
+
+| Task | Status | Notes |
+|---|---|---|
+| Extension Java files (29) copied to `extension/` | ✅ Done | Commit `1dca6b0` |
+| `patches/AndroidManifest.xml` — 9 activity declarations | ✅ Done | `fullSensor` auto-rotate |
+| `patches/res/menu/main_menu.xml` — 3 store items | ✅ Done | After Steam entry |
+| `patches/res/values/public.xml` — 3 ID pins | ✅ Done | IDs `0x7f09054e/4f/50` |
+| `patches/smali_classes2/R$id.smali` — 3 field constants | ✅ Done | IDs `0x7f09054e/4f/50` |
+| `patches/smali_classes9/MainActivity.smali` — if-eq store dispatch | ✅ Done | Uses `v3` scratch (not `v2`) |
+| CI: download deps + compile classes23.dex + inject | ✅ Done | Commit `1dca6b0` |
+| VerifyError fix (v2 register clobbered) | ✅ Fixed | Commit `6d9acd4` |
+| Auto-rotate for all 9 store activities | ✅ Done | Commit `dbca037` |
+| Custom app icon (ref4ik.png) all densities | ✅ Done | Commit `11fb64c` |
+| CI build passing end-to-end | ✅ CI ✅ | Run `24291045707` |
+
+---
+
+## Critical Implementation Notes (lessons learned)
+
+### ID conflict — packed-switch IDs were already taken
+The report originally planned IDs `0x7f0903bb–0x7f0903bd` for GOG/Epic/Amazon (adjacent to steam at `0x7f0903ba`). These were already taken in REF4IK by `main_menu_task_manager`, `main_menu_terminal`, `main_menu_toggle_fullscreen`. IDs through `0x7f09054d` were also occupied.
+
+**Resolution:** Used IDs `0x7f09054e` (GOG), `0x7f09054f` (Epic), `0x7f090550` (Amazon) — the next free slots after the last `id`-type entry in `public.xml`. Because these are far from the steam ID (`0x7f0903ba`), a packed-switch extension would require ~1,100 gap entries. Instead, **if-eq checks** were injected between the `packed-switch` instruction and its fallthrough label.
+
+### VerifyError — v2 register clobbered
+The `onNavigationItemSelected` method sets `v2 = 1` (boolean true) early on as the return value. Our store handlers originally used `v2` as scratch for `closeDrawer` and `const-class`, clobbering it with large integers. This caused:
+```
+VerifyError: register v2 has type IntegerConstant but expected Boolean return-1nr
+```
+**Resolution:** Switched all scratch register usage in store handlers to `v3`, matching the existing Steam (`pswitch_1`) handler pattern. `v2` is never touched in our injected blocks.
+
+### Injection point for if-eq checks
+The if-eq checks are placed **after** `packed-switch v1, :pswitch_data_0` and **before** `:pswitch_0` (the default/fallthrough label). This means unrecognised IDs still fall through to `:pswitch_0 → goto :goto_0` correctly.
 
 ---
 
