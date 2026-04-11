@@ -1921,14 +1921,15 @@
     packed-switch v1, :pswitch_data_0
 
     # REF4IK-Banner: store menu items (IDs outside packed-switch range)
-    const v2, 0x7f09054e
-    if-eq v1, v2, :store_gog
+    # Use v3 as scratch — v2 must stay as boolean 1 (return value)
+    const v3, 0x7f09054e
+    if-eq v1, v3, :store_gog
 
-    const v2, 0x7f09054f
-    if-eq v1, v2, :store_epic
+    const v3, 0x7f09054f
+    if-eq v1, v3, :store_epic
 
-    const v2, 0x7f090550
-    if-eq v1, v2, :store_amazon
+    const v3, 0x7f090550
+    if-eq v1, v3, :store_amazon
 
     :pswitch_0
     goto/16 :goto_0
@@ -1936,15 +1937,15 @@
     :store_gog
     iget-object v1, p0, Lcom/winlator/cmod/MainActivity;->drawerLayout:Landroidx/drawerlayout/widget/DrawerLayout;
 
-    const v2, 0x800003
+    const v3, 0x800003
 
-    invoke-virtual {v1, v2}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
+    invoke-virtual {v1, v3}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
 
     new-instance v1, Landroid/content/Intent;
 
-    const-class v2, Lcom/winlator/cmod/store/GogMainActivity;
+    const-class v3, Lcom/winlator/cmod/store/GogMainActivity;
 
-    invoke-direct {v1, p0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+    invoke-direct {v1, p0, v3}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
 
     invoke-virtual {p0, v1}, Lcom/winlator/cmod/MainActivity;->startActivity(Landroid/content/Intent;)V
 
@@ -1953,15 +1954,15 @@
     :store_epic
     iget-object v1, p0, Lcom/winlator/cmod/MainActivity;->drawerLayout:Landroidx/drawerlayout/widget/DrawerLayout;
 
-    const v2, 0x800003
+    const v3, 0x800003
 
-    invoke-virtual {v1, v2}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
+    invoke-virtual {v1, v3}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
 
     new-instance v1, Landroid/content/Intent;
 
-    const-class v2, Lcom/winlator/cmod/store/EpicMainActivity;
+    const-class v3, Lcom/winlator/cmod/store/EpicMainActivity;
 
-    invoke-direct {v1, p0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+    invoke-direct {v1, p0, v3}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
 
     invoke-virtual {p0, v1}, Lcom/winlator/cmod/MainActivity;->startActivity(Landroid/content/Intent;)V
 
@@ -1970,15 +1971,15 @@
     :store_amazon
     iget-object v1, p0, Lcom/winlator/cmod/MainActivity;->drawerLayout:Landroidx/drawerlayout/widget/DrawerLayout;
 
-    const v2, 0x800003
+    const v3, 0x800003
 
-    invoke-virtual {v1, v2}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
+    invoke-virtual {v1, v3}, Landroidx/drawerlayout/widget/DrawerLayout;->closeDrawer(I)V
 
     new-instance v1, Landroid/content/Intent;
 
-    const-class v2, Lcom/winlator/cmod/store/AmazonMainActivity;
+    const-class v3, Lcom/winlator/cmod/store/AmazonMainActivity;
 
-    invoke-direct {v1, p0, v2}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
+    invoke-direct {v1, p0, v3}, Landroid/content/Intent;-><init>(Landroid/content/Context;Ljava/lang/Class;)V
 
     invoke-virtual {p0, v1}, Lcom/winlator/cmod/MainActivity;->startActivity(Landroid/content/Intent;)V
 
