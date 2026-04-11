@@ -53,9 +53,41 @@ jobs:
             echo "No patches to apply."
           fi
 
+      - name: Download extension dependencies
+        run: |
+          wget -q "https://repo1.maven.org/maven2/org/json/json/20240303/json-20240303.jar" -O org-json.jar
+          wget -q "https://repo1.maven.org/maven2/org/apache/commons/commons-compress/1.26.0/commons-compress-1.26.0.jar" -O commons-compress.jar
+
+      - name: Compile store extension (GOG/Epic/Amazon) → classes23.dex
+        run: |
+          ANDROID_JAR=$(ls $ANDROID_SDK_ROOT/platforms/android-*/android.jar 2>/dev/null | sort -V | tail -1)
+          echo "Using android.jar: $ANDROID_JAR"
+
+          mkdir -p ext_store_classes
+          javac -source 8 -target 8 \
+            -cp "$ANDROID_JAR:org-json.jar:commons-compress.jar" \
+            -d ext_store_classes \
+            extension/*.java
+          echo "Compiled $(find ext_store_classes -name '*.class' | wc -l) class files"
+
+          BUILD_TOOLS=$(ls $ANDROID_SDK_ROOT/build-tools | sort -V | tail -1)
+          mkdir -p ext_store_dex
+          $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/d8 \
+            --release --min-api 26 --output ext_store_dex \
+            $(find ext_store_classes -name "*.class") \
+            org-json.jar \
+            commons-compress.jar
+          echo "classes23.dex ready: $(du -sh ext_store_dex/classes.dex | cut -f1)"
+
       - name: Rebuild APK
         run: |
           java -jar $HOME/bin/apktool.jar b apktool_out -o rebuilt-unsigned.apk
+
+      - name: Inject classes23.dex (store extension)
+        run: |
+          cp ext_store_dex/classes.dex classes23.dex
+          zip -j rebuilt-unsigned.apk classes23.dex
+          echo "classes23.dex injected ($(du -sh classes23.dex | cut -f1))"
 
       - name: Align and Sign
         run: |

@@ -43,6 +43,15 @@
         <activity android:exported="false" android:name="com.winlator.cmod.saves.CustomFilePickerActivity" android:screenOrientation="sensor" android:theme="@style/AppTheme"/>
         <activity android:exported="false" android:name="com.winlator.cmod.FileManagerActivity" android:theme="@style/AppTheme"/>
         <activity android:exported="false" android:name="com.winlator.cmod.steam.SteamLibraryActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.GogMainActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.GogLoginActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.GogGamesActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.EpicMainActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.EpicLoginActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.EpicGamesActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.AmazonMainActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.AmazonLoginActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
+        <activity android:exported="false" android:name="com.winlator.cmod.store.AmazonGamesActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme"/>
         <activity android:exported="false" android:name="com.winlator.cmod.steam.SteamLoginActivity" android:screenOrientation="sensor" android:theme="@style/AppTheme"/>
         <activity android:exported="false" android:name="com.winlator.cmod.steam.SteamShortcutSettingsActivity" android:screenOrientation="sensorLandscape" android:theme="@style/AppTheme.SteamSettings"/>
         <receiver android:exported="true" android:name="com.winlator.cmod.ShortcutBroadcastReceiver">
