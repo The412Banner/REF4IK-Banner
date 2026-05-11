@@ -1,4 +1,6 @@
 # Winlator REF4IK+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/n8S4G2WZQ4)
+
 
 <p align="center">
   <img src="ref4ik.png" width="120" alt="Winlator REF4IK+ icon"/>
@@ -99,3 +101,8 @@ To trigger a build manually: **Actions → Build APK → Run workflow**.
 ## License
 
 This repo contains no original source code. All components and the base APK are the work of their respective authors listed in the Credits section above.
+
+
+## Community
+
+Join our Discord: https://discord.gg/n8S4G2WZQ4
